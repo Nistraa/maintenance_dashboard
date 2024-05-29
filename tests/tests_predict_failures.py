@@ -1,13 +1,13 @@
 import unittest
 import numpy as np
 import pandas as pd
-from services.predict_failures import PredictFailuresService
+from services import PredictFailuresService
 
 class MockModel:
     def predict(self, feature):
         return [0] * len(feature)
     
-class TestPredictFailuresService(unittest.Testcase):
+class TestPredictFailuresService(unittest.TestCase):
     def setUp(self):
         self.predict_failures_service = PredictFailuresService()
 

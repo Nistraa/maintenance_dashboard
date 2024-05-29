@@ -1,8 +1,7 @@
 import unittest
 import numpy as np
 import pandas as pd
-from services.extract_features import ExtractFeaturesService
-
+from services import ExtractFeaturesService
 class TestExtractFeaturesService(unittest.TestCase):
     def setUp(self):
         self.extract_features_service = ExtractFeaturesService()
@@ -13,8 +12,8 @@ class TestExtractFeaturesService(unittest.TestCase):
         })
 
         features = self.extract_features_service.extract_features(data)
-        self.assertIn('mean', features)
-        self.assertIn('std', features)
+        self.assertIn('sensor_mean', features)
+        self.assertIn('sensor_std', features)
 
 if __name__ == '__main__':
     unittest.main()

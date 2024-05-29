@@ -1,10 +1,10 @@
 import unittest
 import numpy as np
 import pandas as pd
-from services.visualize_data import VisualizeDataService
-
+from services import VisualizeDataService
 class TestVisualizeDataService(unittest.TestCase):
-    def setUp(self):
+    def __init__(self, methodName='runTest'):
+        super().__init__(methodName)        
         self.visualize_data_service = VisualizeDataService()
 
     def test_visualize_data(self):

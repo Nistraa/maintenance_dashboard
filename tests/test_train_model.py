@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 import pandas as pd
-from services.train_model import TrainModelService
+from services import TrainModelService
 
 class TestTrainModelService(unittest.TestCase):
     def setUp(self):
