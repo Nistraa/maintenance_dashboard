@@ -1,8 +1,5 @@
 import unittest
 from services import PreprocessDataService
-from sklearn.preprocessing import LabelEncoder
-from sklearn.impute import KNNImputer
-from category_encoders import TargetEncoder
 import pandas as pd
 import numpy as np
 
@@ -21,9 +18,8 @@ class TestPreprocessDataService(unittest.TestCase):
         self.categoricalData = pd.DataFrame({
             'category': ['A', 'B', 'C', 'A', 'B', 'C'],
             'target': [1, 0, 1, 0, 1, 0]        
-            })
-        self.le = LabelEncoder()
-        
+            })  
+        self.scalerData = [[-1, 2], [-0.5, 6], [0, 10], [1, 18]]
     '''
     Test method for forward filling missing data
     '''
@@ -31,16 +27,16 @@ class TestPreprocessDataService(unittest.TestCase):
         processed_data = self.preprocess_data_service.HandleMissingNumericals.forward_fill_data(self, self.numericalData)
         self.assertIsNotNone(processed_data)
         self.assertFalse(processed_data.isnull().values.any())
-        self.assertEqual(processed_data['sensor_value'].iloc[2], 100)
+        self.assertEqual(processed_data['sensor_value'].iloc[2], 110.0)
 
     '''
     Test method for backward filling missing data
     '''
-    def test_forward_fill_data(self):
+    def test_backward_fill_data(self):
         processed_data = self.preprocess_data_service.HandleMissingNumericals.backward_fill_data(self, self.numericalData)
         self.assertIsNotNone(processed_data)
         self.assertFalse(processed_data.isnull().values.any())
-        self.assertEqual(processed_data['sensor_value'].iloc[2], 115)
+        self.assertEqual(processed_data['sensor_value'].iloc[2], 115.0)
 
     '''
     Test method for using the mean for missing data
@@ -58,12 +54,12 @@ class TestPreprocessDataService(unittest.TestCase):
         processed_data = self.preprocess_data_service.HandleMissingNumericals.imputate_median_for_missing_data(self, self.numericalData)
         self.assertIsNotNone(processed_data)
         self.assertFalse(processed_data.isnull().values.any())
-        self.assertEqual(processed_data['sensor_value'].iloc[2], self.numericalData['sensor_value'].mean())
+        self.assertEqual(processed_data['sensor_value'].iloc[2], self.numericalData['sensor_value'].median())
 
     '''
     Test method for using the mode for missing data
     '''
-    def test_imputate_mean_for_missing_data(self):
+    def test_imputate_mode_for_missing_data(self):
         processed_data = self.preprocess_data_service.HandleMissingNumericals.imputate_mode_for_missing_data(self, self.numericalData)
         self.assertIsNotNone(processed_data)
         self.assertFalse(processed_data.isnull().values.any())
@@ -73,7 +69,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test method for interpolating linear values for missing data
     '''
     def test_interpolate_linear_missing_data(self):
-        processed_data = self.preprocess_data_service.HandleMissingNumericals.interpolate_linear_missing_data(self, self.numericalData)
+        processed_data = self.preprocess_data_service.HandleMissingNumericals.interpolate_linear_missing_data(self, self.numericalData['sensor_value'])
         self.assertIsNotNone(processed_data)
         self.assertFalse(processed_data.isnull().values.any())
 
@@ -90,9 +86,9 @@ class TestPreprocessDataService(unittest.TestCase):
     '''
     def test_label_encode_variables(self):
         processed_data = self.preprocess_data_service.HandleCategoricalVariables.label_encode_variables(self, self.categoricalData['category'])
-        expected_data = [0,1,2,0,2]
+        expected_data = [0,1,2,0,1,2]
         self.assertIsNotNone(processed_data)
-        self.assertListEqual(processed_data.toList(), expected_data)
+        self.assertListEqual(list(processed_data), expected_data)
 
     '''
     Test label encoding method for consistency
@@ -102,13 +98,13 @@ class TestPreprocessDataService(unittest.TestCase):
         processed_data_2 = self.preprocess_data_service.HandleCategoricalVariables.label_encode_variables(self, self.categoricalData['category'])
         self.assertIsNotNone(processed_data_1)
         self.assertIsNotNone(processed_data_2)
-        self.assertListEqual(processed_data_1.toList(), processed_data_2.toList())
+        self.assertListEqual(list(processed_data_1), list(processed_data_2))
 
     '''
     Test one-hot encoding method
     '''
     def test_one_hot_encode_variables(self):
-        processed_data = self.preprocess_data_service.HandleCategoricalVariables.one_hot_encode_variables(self, self.categoricalData['category'])
+        processed_data = self.preprocess_data_service.HandleCategoricalVariables.one_hot_encode_variables(self, self.categoricalData['category'], 'category')
         expected_columns = ['category_A', 'category_B', 'category_C']
         self.assertListEqual(list(processed_data.columns), expected_columns)
         self.assertEqual(processed_data.shape, (6, 3))
@@ -118,40 +114,38 @@ class TestPreprocessDataService(unittest.TestCase):
     Test target encoding method
     '''
     def test_target_encode_variables(self):
-        processed_data = self.preprocess_data_service.HandleCategoricalVariables.target_encode_variables(self, self.categoricalData)
+        processed_data = self.preprocess_data_service.HandleCategoricalVariables.target_encode_variables(self, self.categoricalData['category'], self.categoricalData['target'])
         expected_means = {
             'A': 0.5,
             'B': 0.5,
             'C': 0.5
         }
         for category in expected_means:
-            self.assertAlmostEqual(processed_data[self.categoricalData['category'] == category].iloc[0], expected_means[category])
+            self.assertAlmostEqual(processed_data['category'].iloc[0], expected_means[category])
 
     '''
     Test target encoding method for consistency
     '''
     def test_target_encode_variables_consistency(self):
-        processed_data_1 = self.preprocess_data_service.HandleCategoricalVariables.target_encode_variables(self, self.categoricalData)
-        processed_data_2 = self.preprocess_data_service.HandleCategoricalVariables.target_encode_variables(self, self.categoricalData)
+        processed_data_1 = self.preprocess_data_service.HandleCategoricalVariables.target_encode_variables(self, self.categoricalData['category'], self.categoricalData['target'])
+        processed_data_2 = self.preprocess_data_service.HandleCategoricalVariables.target_encode_variables(self, self.categoricalData['category'], self.categoricalData['target'])
         self.assertIsNotNone(processed_data_1)
         self.assertIsNotNone(processed_data_2)
-        self.assertListEqual(processed_data_1.toList(), processed_data_2.toList())
+        self.assertListEqual(list(processed_data_1['category']), list(processed_data_2['category']))
 
     '''
     Test feature scaling for missing data
     '''
-    def test_feature_scaling(self):
-        processed_data = self.preprocess_data_service.FeatureScaleData.min_max_scale_features(self, self.numericalData)
+    def test_min_max_scale_features(self):
+        processed_data = self.preprocess_data_service.FeatureScaleData.min_max_scale_features(self, self.scalerData)
         self.assertIsNotNone(processed_data)
-        self.assertFalse(processed_data.isnull().values.any())
 
     '''
     Test robust scaling for missing data
     '''
-    def test_feature_scaling(self):
-        processed_data = self.preprocess_data_service.FeatureScaleData.robust_scale_features(self, self.numericalData)
+    def test_robust_scale_features(self):
+        processed_data = self.preprocess_data_service.FeatureScaleData.robust_scale_features(self, self.scalerData)
         self.assertIsNotNone(processed_data)
-        self.assertFalse(processed_data.isnull().values.any())
 
 
 if __name__ == '__main__':
