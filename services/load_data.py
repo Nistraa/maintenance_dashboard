@@ -9,3 +9,9 @@ class LoadDataService:
     # Method to read data from given file path
     def read_data(self, file_path):
         return pd.read_csv(file_path)
+    
+    '''
+    #
+    '''
+    def generate_sqlmodel(self, data: pd.DataFrame):
+        return NotImplementedError()
