@@ -1,6 +1,7 @@
 import unittest
 import numpy as np
 import pandas as pd
+import pandas.testing as pdt
 from services import ExtractFeaturesService
 
 '''
@@ -25,35 +26,34 @@ class TestExtractFeaturesService(unittest.TestCase):
         
         self.assertIsNotNone(dataframe)
         self.assertIsInstance(dataframe, pd.DataFrame)
-        self.assertEqual(dataframe, self.data.head())
+        pdt.assert_frame_equal(dataframe, self.data.head())
 
     def test_pandas_standard_method_describe(self):
         dataframe = self.extract_features_service.pandas_standard_methods.pandas_standard_method(self.data, 'describe')
-        
+
         self.assertIsNotNone(dataframe)
         self.assertIsInstance(dataframe, pd.DataFrame)
-        self.assertEqual(dataframe, self.data.describe())
+        pdt.assert_frame_equal(dataframe, self.data.describe())
 
     def test_pandas_standard_method_info(self):
         dataframe = self.extract_features_service.pandas_standard_methods.pandas_standard_method(self.data, 'info')
         
         self.assertIsNotNone(dataframe)
-        self.assertIsInstance(dataframe, pd.DataFrame)
-        self.assertEqual(dataframe, self.data.info())
+        self.assertIsInstance(dataframe, str)
 
     def test_pandas_standard_method_isna(self):
         dataframe = self.extract_features_service.pandas_standard_methods.pandas_standard_method(self.data, 'isna')
         
         self.assertIsNotNone(dataframe)
         self.assertIsInstance(dataframe, pd.DataFrame)
-        self.assertTrue(dataframe.bool())
+        pdt.assert_frame_equal(dataframe, self.data.isna())
       
     def test_pandas_standard_method_uniques(self):
         dataframe = self.extract_features_service.pandas_standard_methods.pandas_standard_method(self.data, 'uniques')
 
         self.assertIsNotNone(dataframe)
-        self.assertIsInstance(dataframe, pd.Series|pd.DataFrame)
-        self.assertEqual(dataframe, self.data.nunique())
+        self.assertIsInstance(dataframe, pd.Series)
+        pdt.assert_series_equal(dataframe, self.data.nunique())
       
 
 if __name__ == '__main__':
