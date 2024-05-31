@@ -226,6 +226,13 @@ class TestPreprocessDataService(unittest.TestCase):
         self.assertIsNotNone(manipulated_data)
         self.assertIsInstance(manipulated_data, pd.DataFrame)
         self.assertTrue(len(manipulated_data.columns) > len(self.numerical_data.columns))
+    
+    def test_column_renaming(self):
+        manipulated_data = self.preprocess_data_service.column_operations.rename_column(self.numerical_data_falsy, 'sensor_value', 'changed')
+
+        self.assertIsNotNone(manipulated_data)
+        self.assertIsInstance(manipulated_data, pd.DataFrame)
+        pdt.assert_frame_equal(manipulated_data, self.numerical_data_falsy.rename(columns={'sensor_value': 'changed'}))
 
 if __name__ == '__main__':
     unittest.main()

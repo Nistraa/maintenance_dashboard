@@ -122,5 +122,5 @@ class PreprocessDataService:
             df_copy[new_column] = self._arithemtic_operation(operation_name, df[operand_column_1], df[operand_column_2])
             return df_copy
         
-        def rename_column(self, df: pd.DataFrame, column_name: str):
-            return df.rename(column_name)
+        def rename_column(self, df: pd.DataFrame, old_column_name: str, new_column_name):
+            return df.rename(columns={old_column_name: new_column_name})
