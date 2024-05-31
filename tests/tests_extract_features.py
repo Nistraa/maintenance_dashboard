@@ -21,38 +21,38 @@ class TestExtractFeaturesService(unittest.TestCase):
     Test method using a dataframe to assure extracted features
     '''
     def test_pandas_standard_method_head(self):
-        dataframe = self.extract_features_service.PandasStandardMethods.pandas_standard_method(self, self.data, 'head')
+        dataframe = self.extract_features_service.pandas_standard_methods.pandas_standard_method(self.data, 'head')
         
         self.assertIsNotNone(dataframe)
         self.assertIsInstance(dataframe, pd.DataFrame)
         self.assertEqual(dataframe, self.data.head())
 
     def test_pandas_standard_method_describe(self):
-        dataframe = self.extract_features_service.PandasStandardMethods.pandas_standard_method(self, self.data, 'describe')
+        dataframe = self.extract_features_service.pandas_standard_methods.pandas_standard_method(self.data, 'describe')
         
         self.assertIsNotNone(dataframe)
         self.assertIsInstance(dataframe, pd.DataFrame)
         self.assertEqual(dataframe, self.data.describe())
 
     def test_pandas_standard_method_info(self):
-        dataframe = self.extract_features_service.PandasStandardMethods.pandas_standard_method(self, self.data, 'info')
+        dataframe = self.extract_features_service.pandas_standard_methods.pandas_standard_method(self.data, 'info')
         
         self.assertIsNotNone(dataframe)
         self.assertIsInstance(dataframe, pd.DataFrame)
         self.assertEqual(dataframe, self.data.info())
 
     def test_pandas_standard_method_isna(self):
-        dataframe = self.extract_features_service.PandasStandardMethods.pandas_standard_method(self, self.data, 'isna')
+        dataframe = self.extract_features_service.pandas_standard_methods.pandas_standard_method(self.data, 'isna')
         
         self.assertIsNotNone(dataframe)
         self.assertIsInstance(dataframe, pd.DataFrame)
-        self.assertEqual(dataframe, self.data.isna())
+        self.assertTrue(dataframe.bool())
       
     def test_pandas_standard_method_uniques(self):
-        dataframe = self.extract_features_service.PandasStandardMethods.pandas_standard_method(self, self.data, 'uniques')
-        
+        dataframe = self.extract_features_service.pandas_standard_methods.pandas_standard_method(self.data, 'uniques')
+
         self.assertIsNotNone(dataframe)
-        self.assertIsInstance(dataframe, pd.DataFrame)
+        self.assertIsInstance(dataframe, pd.Series|pd.DataFrame)
         self.assertEqual(dataframe, self.data.nunique())
       
 

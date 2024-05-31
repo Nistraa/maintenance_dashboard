@@ -1,17 +1,33 @@
 import pandas as pd
-
+from io import StringIO
 
 # Service to extract features from data
 class ExtractFeaturesService:
     def __init__(self) -> None:
-        pass
+        self.pandas_standard_methods = self.PandasStandardMethods()
 
     # Method to calculate rolling mean and standard deviation of sensor values
     class PandasStandardMethods:
         def __init__(self) -> None:
-            self.pandas_methods = {
+            self._pandas_methods = {
+            'head': pd.DataFrame.head,
+            'describe': pd.DataFrame.describe,
+            'info': self._info,
+            'isna': pd.DataFrame.isna,
+            'uniques': self._uniques,
         }
+            
+        def _info(self, df: pd.DataFrame):
+            buffer = StringIO()
+            df.info(buf=buffer)
+            return buffer.getvalue()
+        
+        def _uniques(self, df: pd.DataFrame):
+            return df.apply(lambda x: x.nunique())
 
         def pandas_standard_method(self, df: pd.DataFrame, method_name: str):
-            return NotImplementedError()
-            return self.pandas_methods[method_name](df) if method_name in self.pandas_methods else ValueError(f"Method {method_name} not recognized.")
+            method = self._pandas_methods.get(method_name)
+            if method:
+                return method(df)
+            else:
+                raise ValueError(f"Method {method_name} not recognized.")
