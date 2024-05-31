@@ -2,13 +2,13 @@ import pandas as pd
 from sklearn.impute import KNNImputer
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler, RobustScaler
 from category_encoders import TargetEncoder
-import math
+import numpy as np
 
 
 # Service to preprocess data
 class PreprocessDataService:
     def __init__(self) -> None:
-        self.arithmetic_operations = self.ColumnOperations()
+        self.column_operations = self.ColumnOperations()
     class HandleMissingNumericals:
         def __init__(self) -> None:
             pass
@@ -100,26 +100,27 @@ class PreprocessDataService:
         def _arithemtic_operation(self, operation_name: str, operand_column_1: pd.Series, operand_column_2: pd.Series|None = None):
             method = self._arithmetic_methods.get(operation_name)
             if method:
-                return method(operand_column_1, operand_column_2)
+                result = method(operand_column_1, operand_column_2)
+                return result
             else:
                 raise ValueError(f"Operation {operation_name} not recognized.")  
                 
         def drop_columns(self, df: pd.DataFrame, columns: list[str]):
-            return NotImplementedError()
-            for column in columns:
-                df.drop(column, axis='columns')
-            return df
+            return df.drop(columns, axis='columns')
         
         def mutate_column(self, df: pd.DataFrame, operation_name: str, target_column: str, operand_column: str|None = None):
-            return NotImplementedError()
-            df[target_column] = self._arithemtic_operation(operation_name, df[target_column], df[operand_column])
-            return df
+            if operand_column == None:
+                operand_column = target_column
+            df_copy = df.copy()
+            df_copy[target_column] = self._arithemtic_operation(operation_name, df[target_column], df[operand_column])
+            return df_copy
         
         def create_column(self, df: pd.DataFrame, operation_name: str, new_column: str, operand_column_1: str, operand_column_2: str|None = None):
-            return NotImplementedError()
-            df[new_column] = self._arithemtic_operation(operation_name, df[operand_column_1], df[operand_column_2])
-            return df
+            if operand_column_2 == None:
+                operand_column_2 = operand_column_1
+            df_copy = df.copy()
+            df_copy[new_column] = self._arithemtic_operation(operation_name, df[operand_column_1], df[operand_column_2])
+            return df_copy
         
         def rename_column(self, df: pd.DataFrame, column_name: str):
-            return NotImplementedError()
             return df.rename(column_name)

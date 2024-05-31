@@ -13,25 +13,25 @@ class TestPreprocessDataService(unittest.TestCase):
     '''
     def setUp(self):
         self.preprocess_data_service = PreprocessDataService()
-        self.numericalDataFalsy = pd.DataFrame({
+        self.numerical_data_falsy = pd.DataFrame({
             'sensor_value': [100, 110, None, 115, 120]
             })
-        self.numericalData = pd.DataFrame({
+        self.numerical_data = pd.DataFrame({
             'sensor_target': [5, 10, 15, 20],
             'sensor_operand': [10, 15, 20, 25],
             'sensor_to_drop_1': [0, 0, 0, 0],
             'sensor_to_drop_2': [0, 0, 0, 0]
             })
-        self.categoricalData = pd.DataFrame({
+        self.categorical_data = pd.DataFrame({
             'category': ['A', 'B', 'C', 'A', 'B', 'C'],
             'target': [1, 0, 1, 0, 1, 0]        
             })  
-        self.scalerData = [[-1, 2], [-0.5, 6], [0, 10], [1, 18]]
+        self.scaler_data = [[-1, 2], [-0.5, 6], [0, 10], [1, 18]]
     '''
     Test method for forward filling missing data
     '''
     def test_forward_fill_data(self):
-        processed_data = self.preprocess_data_service.HandleMissingNumericals.forward_fill_data(self, self.numericalDataFalsy)
+        processed_data = self.preprocess_data_service.HandleMissingNumericals.forward_fill_data(self, self.numerical_data_falsy)
         self.assertIsNotNone(processed_data)
         self.assertFalse(processed_data.isnull().values.any())
         self.assertEqual(processed_data['sensor_value'].iloc[2], 110.0)
@@ -40,7 +40,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test method for backward filling missing data
     '''
     def test_backward_fill_data(self):
-        processed_data = self.preprocess_data_service.HandleMissingNumericals.backward_fill_data(self, self.numericalDataFalsy)
+        processed_data = self.preprocess_data_service.HandleMissingNumericals.backward_fill_data(self, self.numerical_data_falsy)
         self.assertIsNotNone(processed_data)
         self.assertFalse(processed_data.isnull().values.any())
         self.assertEqual(processed_data['sensor_value'].iloc[2], 115.0)
@@ -49,34 +49,34 @@ class TestPreprocessDataService(unittest.TestCase):
     Test method for using the mean for missing data
     '''
     def test_imputate_mean_for_missing_data(self):
-        processed_data = self.preprocess_data_service.HandleMissingNumericals.imputate_mean_for_missing_data(self, self.numericalDataFalsy)
+        processed_data = self.preprocess_data_service.HandleMissingNumericals.imputate_mean_for_missing_data(self, self.numerical_data_falsy)
         self.assertIsNotNone(processed_data)
         self.assertFalse(processed_data.isnull().values.any())
-        self.assertEqual(processed_data['sensor_value'].iloc[2], self.numericalDataFalsy['sensor_value'].mean())
+        self.assertEqual(processed_data['sensor_value'].iloc[2], self.numerical_data_falsy['sensor_value'].mean())
 
     '''
     Test method for using the median for missing data
     '''
     def test_imputate_median_for_missing_data(self):
-        processed_data = self.preprocess_data_service.HandleMissingNumericals.imputate_median_for_missing_data(self, self.numericalDataFalsy)
+        processed_data = self.preprocess_data_service.HandleMissingNumericals.imputate_median_for_missing_data(self, self.numerical_data_falsy)
         self.assertIsNotNone(processed_data)
         self.assertFalse(processed_data.isnull().values.any())
-        self.assertEqual(processed_data['sensor_value'].iloc[2], self.numericalDataFalsy['sensor_value'].median())
+        self.assertEqual(processed_data['sensor_value'].iloc[2], self.numerical_data_falsy['sensor_value'].median())
 
     '''
     Test method for using the mode for missing data
     '''
     def test_imputate_mode_for_missing_data(self):
-        processed_data = self.preprocess_data_service.HandleMissingNumericals.imputate_mode_for_missing_data(self, self.numericalDataFalsy)
+        processed_data = self.preprocess_data_service.HandleMissingNumericals.imputate_mode_for_missing_data(self, self.numerical_data_falsy)
         self.assertIsNotNone(processed_data)
         self.assertFalse(processed_data.isnull().values.any())
-        self.assertEqual(processed_data['sensor_value'].iloc[2], self.numericalDataFalsy['sensor_value'].mode().iloc[0])
+        self.assertEqual(processed_data['sensor_value'].iloc[2], self.numerical_data_falsy['sensor_value'].mode().iloc[0])
 
     '''
     Test method for interpolating linear values for missing data
     '''
     def test_interpolate_linear_missing_data(self):
-        processed_data = self.preprocess_data_service.HandleMissingNumericals.interpolate_linear_missing_data(self, self.numericalDataFalsy['sensor_value'])
+        processed_data = self.preprocess_data_service.HandleMissingNumericals.interpolate_linear_missing_data(self, self.numerical_data_falsy['sensor_value'])
         self.assertIsNotNone(processed_data)
         self.assertFalse(processed_data.isnull().values.any())
 
@@ -84,7 +84,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test method for using the k-nearest-neighbour heuristic for missing data
     '''
     def test_interpolate_knn_missing_data(self):
-        processed_data = self.preprocess_data_service.HandleMissingNumericals.interpolate_knn_missing_data(self, self.numericalDataFalsy)
+        processed_data = self.preprocess_data_service.HandleMissingNumericals.interpolate_knn_missing_data(self, self.numerical_data_falsy)
         self.assertIsNotNone(processed_data)
         self.assertFalse(processed_data.isnull().values.any())
 
@@ -92,7 +92,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test label encoding method
     '''
     def test_label_encode_variables(self):
-        processed_data = self.preprocess_data_service.HandleCategoricalVariables.label_encode_variables(self, self.categoricalData['category'])
+        processed_data = self.preprocess_data_service.HandleCategoricalVariables.label_encode_variables(self, self.categorical_data['category'])
         expected_data = [0,1,2,0,1,2]
         self.assertIsNotNone(processed_data)
         self.assertListEqual(list(processed_data), expected_data)
@@ -101,8 +101,8 @@ class TestPreprocessDataService(unittest.TestCase):
     Test label encoding method for consistency
     '''
     def test_label_encode_variables_consistency(self):
-        processed_data_1 = self.preprocess_data_service.HandleCategoricalVariables.label_encode_variables(self, self.categoricalData['category'])
-        processed_data_2 = self.preprocess_data_service.HandleCategoricalVariables.label_encode_variables(self, self.categoricalData['category'])
+        processed_data_1 = self.preprocess_data_service.HandleCategoricalVariables.label_encode_variables(self, self.categorical_data['category'])
+        processed_data_2 = self.preprocess_data_service.HandleCategoricalVariables.label_encode_variables(self, self.categorical_data['category'])
         self.assertIsNotNone(processed_data_1)
         self.assertIsNotNone(processed_data_2)
         self.assertListEqual(list(processed_data_1), list(processed_data_2))
@@ -111,7 +111,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test one-hot encoding method
     '''
     def test_one_hot_encode_variables(self):
-        processed_data = self.preprocess_data_service.HandleCategoricalVariables.one_hot_encode_variables(self, self.categoricalData['category'], 'category')
+        processed_data = self.preprocess_data_service.HandleCategoricalVariables.one_hot_encode_variables(self, self.categorical_data['category'], 'category')
         expected_columns = ['category_A', 'category_B', 'category_C']
         self.assertListEqual(list(processed_data.columns), expected_columns)
         self.assertEqual(processed_data.shape, (6, 3))
@@ -121,7 +121,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test target encoding method
     '''
     def test_target_encode_variables(self):
-        processed_data = self.preprocess_data_service.HandleCategoricalVariables.target_encode_variables(self, self.categoricalData['category'], self.categoricalData['target'])
+        processed_data = self.preprocess_data_service.HandleCategoricalVariables.target_encode_variables(self, self.categorical_data['category'], self.categorical_data['target'])
         expected_means = {
             'A': 0.5,
             'B': 0.5,
@@ -134,8 +134,8 @@ class TestPreprocessDataService(unittest.TestCase):
     Test target encoding method for consistency
     '''
     def test_target_encode_variables_consistency(self):
-        processed_data_1 = self.preprocess_data_service.HandleCategoricalVariables.target_encode_variables(self, self.categoricalData['category'], self.categoricalData['target'])
-        processed_data_2 = self.preprocess_data_service.HandleCategoricalVariables.target_encode_variables(self, self.categoricalData['category'], self.categoricalData['target'])
+        processed_data_1 = self.preprocess_data_service.HandleCategoricalVariables.target_encode_variables(self, self.categorical_data['category'], self.categorical_data['target'])
+        processed_data_2 = self.preprocess_data_service.HandleCategoricalVariables.target_encode_variables(self, self.categorical_data['category'], self.categorical_data['target'])
         self.assertIsNotNone(processed_data_1)
         self.assertIsNotNone(processed_data_2)
         self.assertListEqual(list(processed_data_1['category']), list(processed_data_2['category']))
@@ -144,76 +144,88 @@ class TestPreprocessDataService(unittest.TestCase):
     Test feature scaling for missing data
     '''
     def test_min_max_scale_features(self):
-        processed_data = self.preprocess_data_service.FeatureScaleData.min_max_scale_features(self, self.scalerData)
+        processed_data = self.preprocess_data_service.FeatureScaleData.min_max_scale_features(self, self.scaler_data)
         self.assertIsNotNone(processed_data)
 
     '''
     Test robust scaling for missing data
     '''
     def test_robust_scale_features(self):
-        processed_data = self.preprocess_data_service.FeatureScaleData.robust_scale_features(self, self.scalerData)
+        processed_data = self.preprocess_data_service.FeatureScaleData.robust_scale_features(self, self.scaler_data)
         self.assertIsNotNone(processed_data)
 
     '''
     Test for functionality of dropping a column
     '''
     def test_drop_columns(self):
-        manipulated_data = self.preprocess_data_service.ColumnOperations.drop_columns(self, self.numericalData, ['sensor_to_drop_1', 'sensor_to_drop_2'])
+        manipulated_data = self.preprocess_data_service.column_operations.drop_columns(self.numerical_data, ['sensor_to_drop_1', 'sensor_to_drop_2'])
 
-        pdt.assert_frame_equal(manipulated_data, self.numericalData.drop(['sensor_to_drop_1', 'sensor_to_drop_2'], axis='columns'))
+        pdt.assert_frame_equal(manipulated_data, self.numerical_data.drop(['sensor_to_drop_1', 'sensor_to_drop_2'], axis='columns'))
     '''
     Test addition of two columns
     '''
     def test_arithmetic_operations_addition(self):
-        manipulated_data = self.preprocess_data_service.ColumnOperations.mutate_column(self, self.numericalData, 'addition', 'sensor_target', 'sensor_operand')
-
+        manipulated_data = self.preprocess_data_service.column_operations.mutate_column(self.numerical_data, 'addition', 'sensor_target', 'sensor_operand')
+        self.numerical_data['sensor_target'] = self.numerical_data['sensor_target'] + self.numerical_data['sensor_operand']
+        
         self.assertIsNotNone(manipulated_data)
         self.assertIsInstance(manipulated_data, pd.DataFrame)
-        pdt.assert_frame_equal(manipulated_data, self.numericalData['sensor_target'] + self.numericalData['sensor_operand'])
+        pdt.assert_frame_equal(manipulated_data, self.numerical_data)
 
     '''
     Test subtraction of two columns
     '''
     def test_arithmetic_operations_subtraction(self):
-        manipulated_data = self.preprocess_data_service.ColumnOperations.mutate_column(self, self.numericalData, 'subtraction', 'sensor_target', 'sensor_operand')
+        manipulated_data = self.preprocess_data_service.column_operations.mutate_column(self.numerical_data, 'subtraction', 'sensor_target', 'sensor_operand')
+        self.numerical_data['sensor_target'] = self.numerical_data['sensor_target'] - self.numerical_data['sensor_operand']
 
         self.assertIsNotNone(manipulated_data)
         self.assertIsInstance(manipulated_data, pd.DataFrame)
-        pdt.assert_frame_equal(manipulated_data, self.numericalData['sensor_target'] - self.numericalData['sensor_operand'])
+        pdt.assert_frame_equal(manipulated_data, self.numerical_data)
     '''
     Test multiplication of two columns
     '''
     def test_arithmetic_operations_multiplication(self):
-        manipulated_data = self.preprocess_data_service.ColumnOperations.mutate_column(self, self.numericalData, 'multiplication', 'sensor_target', 'sensor_operand')
+        manipulated_data = self.preprocess_data_service.column_operations.mutate_column(self.numerical_data, 'multiplication', 'sensor_target', 'sensor_operand')
+        self.numerical_data['sensor_target'] = self.numerical_data['sensor_target'] * self.numerical_data['sensor_operand']
 
         self.assertIsNotNone(manipulated_data)
         self.assertIsInstance(manipulated_data, pd.DataFrame)
-        pdt.assert_frame_equal(manipulated_data, self.numericalData['sensor_target'] * self.numericalData['sensor_operand'])
+        pdt.assert_frame_equal(manipulated_data, self.numerical_data)
     '''
     Test division of two columns
     '''
     def test_arithmetic_operations_division(self):
-        manipulated_data = self.preprocess_data_service.ColumnOperations.mutate_column(self, self.numericalData, 'division', 'sensor_target', 'sensor_operand')
+        manipulated_data = self.preprocess_data_service.column_operations.mutate_column(self.numerical_data, 'division', 'sensor_target', 'sensor_operand')
+        self.numerical_data['sensor_target'] = self.numerical_data['sensor_target'] / self.numerical_data['sensor_operand']
 
         self.assertIsNotNone(manipulated_data)
         self.assertIsInstance(manipulated_data, pd.DataFrame)
-        pdt.assert_frame_equal(manipulated_data, self.numericalData['sensor_target'] / self.numericalData['sensor_operand'])
+        pdt.assert_frame_equal(manipulated_data, self.numerical_data)
     '''
     Test squaring of two columns
     '''
     def test_arithmetic_operations_square(self):
-        manipulated_data = self.preprocess_data_service.ColumnOperations.mutate_column(self, self.numericalData, 'square', 'sensor_target')
+        manipulated_data = self.preprocess_data_service.column_operations.mutate_column(self.numerical_data, 'square', 'sensor_target')
+        self.numerical_data['sensor_target'] = self.numerical_data['sensor_target'] ** self.numerical_data['sensor_target']
 
         self.assertIsNotNone(manipulated_data)
         self.assertIsInstance(manipulated_data, pd.DataFrame)
-        pdt.assert_frame_equal(manipulated_data, self.numericalData['sensor_target'] ** self.numericalData['sensor_target'])
+        pdt.assert_frame_equal(manipulated_data, self.numerical_data)
 
-    def test_column_creation(self):
-        manipulated_data = self.preprocess_data_service.ColumnOperations.create_column(self, self.numericalData, 'square', 'new_column', 'sensor_operand')
+    def test_column_creation_square(self):
+        manipulated_data = self.preprocess_data_service.column_operations.create_column(self.numerical_data, 'square', 'new_column', 'sensor_operand')
 
         self.assertIsNotNone(manipulated_data)
         self.assertIsInstance(manipulated_data, pd.DataFrame)
-        self.assertTrue(len(manipulated_data) > len(self.numericalData))
+        self.assertTrue(len(manipulated_data.columns) > len(self.numerical_data.columns))
+
+    def test_column_creation_subtraction(self):
+        manipulated_data = self.preprocess_data_service.column_operations.create_column(self.numerical_data, 'subtraction', 'new_column', 'sensor_target', 'sensor_operand')
+
+        self.assertIsNotNone(manipulated_data)
+        self.assertIsInstance(manipulated_data, pd.DataFrame)
+        self.assertTrue(len(manipulated_data.columns) > len(self.numerical_data.columns))
 
 if __name__ == '__main__':
     unittest.main()
