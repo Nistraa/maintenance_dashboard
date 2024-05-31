@@ -18,6 +18,7 @@ class TestLoadDataService(unittest.TestCase):
     '''
     Test method to queck if generated model is an instance of SQLModel and to
     assert if columns are correctly filled
+    # TO BE DONE
     '''
     def test_generate_sqlmodel(self):
         sqlmodel = self.load_data_service.generate_sqlmodel('dataset/test.csv')
