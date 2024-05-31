@@ -212,7 +212,9 @@ class TestPreprocessDataService(unittest.TestCase):
         self.assertIsNotNone(manipulated_data)
         self.assertIsInstance(manipulated_data, pd.DataFrame)
         pdt.assert_frame_equal(manipulated_data, self.numerical_data)
-
+    '''
+    Tests for creating a new column
+    '''
     def test_column_creation_square(self):
         manipulated_data = self.preprocess_data_service.column_operations.create_column(self.numerical_data, 'square', 'new_column', 'sensor_operand')
 
@@ -227,6 +229,9 @@ class TestPreprocessDataService(unittest.TestCase):
         self.assertIsInstance(manipulated_data, pd.DataFrame)
         self.assertTrue(len(manipulated_data.columns) > len(self.numerical_data.columns))
     
+    '''
+    Test for renaming of a column
+    '''
     def test_column_renaming(self):
         manipulated_data = self.preprocess_data_service.column_operations.rename_column(self.numerical_data_falsy, 'sensor_value', 'changed')
 

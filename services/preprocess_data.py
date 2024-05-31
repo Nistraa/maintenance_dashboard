@@ -87,6 +87,9 @@ class PreprocessDataService:
             return RobustScaler().fit_transform(data)
         
     class ColumnOperations:
+        '''
+        private dictionary containg all arithemtic methods
+        '''
         def __init__(self) -> None:
             self._arithmetic_methods = {
                 'addition': lambda x, y: x + y,
@@ -97,6 +100,10 @@ class PreprocessDataService:
 
             }
 
+        '''
+        Application of arithemtic methods to two columns of a datframe. 
+        Operation is determined by parameter operation name
+        '''
         def _arithemtic_operation(self, operation_name: str, operand_column_1: pd.Series, operand_column_2: pd.Series|None = None):
             method = self._arithmetic_methods.get(operation_name)
             if method:
@@ -104,23 +111,30 @@ class PreprocessDataService:
                 return result
             else:
                 raise ValueError(f"Operation {operation_name} not recognized.")  
-                
+        '''
+        Method for deleting columns'''        
         def drop_columns(self, df: pd.DataFrame, columns: list[str]):
             return df.drop(columns, axis='columns')
-        
+        '''
+        Method for mutating a column given an operand column.
+        Type of arithmetic operation is determined by operation_name'''
         def mutate_column(self, df: pd.DataFrame, operation_name: str, target_column: str, operand_column: str|None = None):
             if operand_column == None:
                 operand_column = target_column
             df_copy = df.copy()
             df_copy[target_column] = self._arithemtic_operation(operation_name, df[target_column], df[operand_column])
             return df_copy
-        
+        '''
+        Method for creating a new column based on existing data in 
+        dataframe
+        '''
         def create_column(self, df: pd.DataFrame, operation_name: str, new_column: str, operand_column_1: str, operand_column_2: str|None = None):
             if operand_column_2 == None:
                 operand_column_2 = operand_column_1
             df_copy = df.copy()
             df_copy[new_column] = self._arithemtic_operation(operation_name, df[operand_column_1], df[operand_column_2])
             return df_copy
-        
+        '''
+        Method for renaming column'''
         def rename_column(self, df: pd.DataFrame, old_column_name: str, new_column_name):
             return df.rename(columns={old_column_name: new_column_name})
