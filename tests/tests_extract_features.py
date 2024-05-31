@@ -19,7 +19,8 @@ class TestExtractFeaturesService(unittest.TestCase):
             })
 
     '''
-    Test method using a dataframe to assure extracted features
+    Test method using a test dataframe to compare if features were extracted
+    correctly. 
     '''
     def test_pandas_standard_method_head(self):
         dataframe = self.extract_features_service.pandas_standard_methods.pandas_standard_method(self.data, 'head')
@@ -35,11 +36,6 @@ class TestExtractFeaturesService(unittest.TestCase):
         self.assertIsInstance(dataframe, pd.DataFrame)
         pdt.assert_frame_equal(dataframe, self.data.describe())
 
-    def test_pandas_standard_method_info(self):
-        dataframe = self.extract_features_service.pandas_standard_methods.pandas_standard_method(self.data, 'info')
-        
-        self.assertIsNotNone(dataframe)
-        self.assertIsInstance(dataframe, str)
 
     def test_pandas_standard_method_isna(self):
         dataframe = self.extract_features_service.pandas_standard_methods.pandas_standard_method(self.data, 'isna')
@@ -54,6 +50,15 @@ class TestExtractFeaturesService(unittest.TestCase):
         self.assertIsNotNone(dataframe)
         self.assertIsInstance(dataframe, pd.Series)
         pdt.assert_series_equal(dataframe, self.data.nunique())
+    '''
+    Test method to assure if dataframe gets succesfully transformed into
+    type dataframe after calling .info() method
+    '''
+    def test_pandas_standard_method_info(self):
+        dataframe = self.extract_features_service.pandas_standard_methods.pandas_standard_method(self.data, 'info')
+        
+        self.assertIsNotNone(dataframe)
+        self.assertIsInstance(dataframe, pd.DataFrame)
       
 
 if __name__ == '__main__':

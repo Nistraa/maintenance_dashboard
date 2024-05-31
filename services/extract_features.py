@@ -1,12 +1,16 @@
 import pandas as pd
 from io import StringIO
 
-# Service to extract features from data
+'''
+Service to extract features from data
+'''
 class ExtractFeaturesService:
     def __init__(self) -> None:
         self.pandas_standard_methods = self.PandasStandardMethods()
 
-    # Method to calculate rolling mean and standard deviation of sensor values
+    '''
+    Method to extract basic features of dataframe
+    '''
     class PandasStandardMethods:
         def __init__(self) -> None:
             self._pandas_methods = {
@@ -20,7 +24,9 @@ class ExtractFeaturesService:
         def _info(self, df: pd.DataFrame):
             buffer = StringIO()
             df.info(buf=buffer)
-            return buffer.getvalue()
+            lines = buffer.getvalue()
+            file = [line.split() for line in lines.splitlines()[3:-2]]
+            return pd.DataFrame(file)
         
         def _uniques(self, df: pd.DataFrame):
             return df.apply(lambda x: x.nunique())
