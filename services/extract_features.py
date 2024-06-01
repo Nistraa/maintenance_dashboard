@@ -13,26 +13,26 @@ class ExtractFeaturesService:
     '''
     class PandasStandardMethods:
         def __init__(self) -> None:
-            self._pandas_methods = {
+            self.__pandas_methods = {
             'head': pd.DataFrame.head,
             'describe': pd.DataFrame.describe,
-            'info': self._info,
+            'info': self.__info,
             'isna': pd.DataFrame.isna,
-            'uniques': self._uniques,
+            'uniques': self.__uniques,
         }
             
-        def _info(self, df: pd.DataFrame):
+        def __info(self, df: pd.DataFrame):
             buffer = StringIO()
             df.info(buf=buffer)
             lines = buffer.getvalue()
             file = [line.split() for line in lines.splitlines()[3:-2]]
             return pd.DataFrame(file)
         
-        def _uniques(self, df: pd.DataFrame):
+        def __uniques(self, df: pd.DataFrame):
             return df.apply(lambda x: x.nunique())
 
         def pandas_standard_method(self, df: pd.DataFrame, method_name: str):
-            method = self._pandas_methods.get(method_name)
+            method = self.__pandas_methods.get(method_name)
             if method:
                 return method(df)
             else:
