@@ -91,7 +91,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test label encoding method
     '''
     def test_label_encode_variables(self):
-        processed_data = self.preprocess_data_service.encode_categorical_variables.encode_categorical_variables(self.categorical_data['category'], 'label')
+        processed_data = self.preprocess_data_service.encode_categorical_variables.encode_categorical_variables(self.categorical_data, 'label', 'category')
         expected_data = [0,1,2,0,1,2]
         self.assertIsNotNone(processed_data)
         self.assertListEqual(list(processed_data), expected_data)
@@ -100,7 +100,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test one-hot encoding method
     '''
     def test_one_hot_encode_variables(self):
-        processed_data = self.preprocess_data_service.encode_categorical_variables.encode_categorical_variables([self.categorical_data['category'], 'category'], 'one_hot')
+        processed_data = self.preprocess_data_service.encode_categorical_variables.encode_categorical_variables(self.categorical_data, 'one_hot', 'category', 'target')
         expected_columns = ['category_A', 'category_B', 'category_C']
         self.assertListEqual(list(processed_data.columns), expected_columns)
         self.assertEqual(processed_data.shape, (6, 3))
@@ -110,7 +110,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test target encoding method
     '''
     def test_target_encode_variables(self):
-        processed_data = self.preprocess_data_service.encode_categorical_variables.encode_categorical_variables(self.categorical_data, 'target')
+        processed_data = self.preprocess_data_service.encode_categorical_variables.encode_categorical_variables(self.categorical_data, 'target', 'category', 'target')
         expected_means = {
             'A': 0.5,
             'B': 0.5,

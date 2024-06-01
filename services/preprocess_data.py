@@ -42,38 +42,44 @@ class PreprocessDataService:
         Method for selecting the demanded interpolation or filling method
         '''
         def fill_missing_numerical(self, df: pd.DataFrame, fill_method: str, fillna: bool = False):
-            method = self.__missing_numericals_methods.get(fill_method)
-            if method:
-                    return df.fillna(method(df)) if fillna else method(df)
-            else:
+            if fill_method not in self.__missing_numericals_methods:
                 raise ValueError(f"Method {fill_method} not recognized.")
-    
+            
+            return df.fillna(self.__missing_numericals_methods[fill_method](df)) if fillna else self.__missing_numericals_methods[fill_method](df)
+        
     class EncodeCategoricalVariables:
         '''
-        Private dictionary containg all feature scaling methods
+        Class to handle various encoding methods for categorical variables.
         '''
         def __init__(self) -> None:
             self.__encoding_method = {
-                'label': LabelEncoder().fit_transform,
+                'label': self.__label_encode,
                 'one_hot': self.__one_hot_encode,
                 'target': self.__target_encode
             }
 
-        def __one_hot_encode(self, data) -> pd.Series:
-            return pd.get_dummies(data[0], data[1])
-        
-        def __target_encode(self, df: pd.DataFrame) -> pd.DataFrame:
-            return TargetEncoder().fit_transform(df['category'], df['target'])
+        def __label_encode(self, data: pd.Series) -> pd.Series:
+            return LabelEncoder().fit_transform(data)
+
+        def __one_hot_encode(self, data: pd.Series) -> pd.DataFrame:
+            return pd.get_dummies(data, data.name)
+
+        def __target_encode(self, df: pd.DataFrame, category_column: str, target_column: str) -> pd.DataFrame:
+            return TargetEncoder().fit_transform(df[category_column], df[target_column])
 
         '''
         Method for selecting the demanded encoder
         '''
-        def encode_categorical_variables(self, df: pd.DataFrame, encoding_method: str):
-            method = self.__encoding_method.get(encoding_method)
-            if method:
-                return method(df)
-            else:
+        def encode_categorical_variables(self, df: pd.DataFrame, encoding_method: str, category_column, target_column: str = None):
+            if encoding_method not in self.__encoding_method:
                 raise ValueError(f"Method {encoding_method} not recognized.")
+            
+            if encoding_method == 'target':
+                if not target_column:
+                    raise ValueError("Target column must be provided for target encoding.")
+                return self.__encoding_method[encoding_method](df, category_column, target_column)
+            
+            return self.__encoding_method[encoding_method](df[category_column])
 
 
     class FeatureScaleData:
@@ -90,12 +96,10 @@ class PreprocessDataService:
         Method for selecting the demanded scaling model
         '''
         def scale_data(self, df: pd.DataFrame, scaling_method: str):
-            method = self.__feature_scaling_methods.get(scaling_method)
-            if method:
-                    return method(df)
-            else:
+            if scaling_method not in self.__feature_scaling_methods:
                 raise ValueError(f"Method {scaling_method} not recognized.")
 
+            return self.__feature_scaling_methods[scaling_method](df)
     class ColumnOperations:
         '''
         Private dictionary containg all arithemtic methods
@@ -115,23 +119,21 @@ class PreprocessDataService:
         Operation is determined by parameter operation_name
         '''
         def __arithemtic_operation(self, operation_name: str, operand_column_1: pd.Series, operand_column_2: pd.Series|None = None):
-            method = self.__arithmetic_methods.get(operation_name)
-            if method:
-                result = method(operand_column_1, operand_column_2)
-                return result
-            else:
+            if operation_name not in self.__arithmetic_methods:
                 raise ValueError(f"Operation {operation_name} not recognized.")  
+            
+            return self.__arithmetic_methods[operation_name](operand_column_1, operand_column_2)
             
         '''
 
         Method for mutating a column given an operand column.
         Type of arithmetic operation is determined by operation_name
         '''
-        def mutate_column(self, df: pd.DataFrame, operation_name: str, target_column: str, operand_column: str|None = None):
+        def mutate_column(self, df: pd.DataFrame, operation_name: str, target_columnumn: str, operand_column: str|None = None):
             if operand_column == None:
-                operand_column = target_column
+                operand_column = target_columnumn
             df_copy = df.copy()
-            df_copy[target_column] = self.__arithemtic_operation(operation_name, df[target_column], df[operand_column])
+            df_copy[target_columnumn] = self.__arithemtic_operation(operation_name, df[target_columnumn], df[operand_column])
             return df_copy
         
         '''
