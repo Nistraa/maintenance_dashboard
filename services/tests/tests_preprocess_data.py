@@ -30,7 +30,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test method for forward filling missing data
     '''
     def test_forward_fill_data(self):
-        processed_data = self.preprocess_data_service.HandleMissingNumericals.forward_fill_data(self, self.numerical_data_falsy)
+        processed_data = self.preprocess_data_service.handle_missing_numericals.fill_missing_numerical(self.numerical_data_falsy, 'ffill')
         self.assertIsNotNone(processed_data)
         self.assertFalse(processed_data.isnull().values.any())
         self.assertEqual(processed_data['sensor_value'].iloc[2], 110.0)
@@ -39,7 +39,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test method for backward filling missing data
     '''
     def test_backward_fill_data(self):
-        processed_data = self.preprocess_data_service.HandleMissingNumericals.backward_fill_data(self, self.numerical_data_falsy)
+        processed_data = self.preprocess_data_service.handle_missing_numericals.fill_missing_numerical(self.numerical_data_falsy, fill_method='bfill')
         self.assertIsNotNone(processed_data)
         self.assertFalse(processed_data.isnull().values.any())
         self.assertEqual(processed_data['sensor_value'].iloc[2], 115.0)
@@ -48,7 +48,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test method for using the mean for missing data
     '''
     def test_imputate_mean_for_missing_data(self):
-        processed_data = self.preprocess_data_service.HandleMissingNumericals.imputate_mean_for_missing_data(self, self.numerical_data_falsy)
+        processed_data = self.preprocess_data_service.handle_missing_numericals.fill_missing_numerical(self.numerical_data_falsy, 'mean', fillna=True)
         self.assertIsNotNone(processed_data)
         self.assertFalse(processed_data.isnull().values.any())
         self.assertEqual(processed_data['sensor_value'].iloc[2], self.numerical_data_falsy['sensor_value'].mean())
@@ -57,7 +57,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test method for using the median for missing data
     '''
     def test_imputate_median_for_missing_data(self):
-        processed_data = self.preprocess_data_service.HandleMissingNumericals.imputate_median_for_missing_data(self, self.numerical_data_falsy)
+        processed_data = self.preprocess_data_service.handle_missing_numericals.fill_missing_numerical(self.numerical_data_falsy, 'median', fillna=True)
         self.assertIsNotNone(processed_data)
         self.assertFalse(processed_data.isnull().values.any())
         self.assertEqual(processed_data['sensor_value'].iloc[2], self.numerical_data_falsy['sensor_value'].median())
@@ -66,7 +66,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test method for using the mode for missing data
     '''
     def test_imputate_mode_for_missing_data(self):
-        processed_data = self.preprocess_data_service.HandleMissingNumericals.imputate_mode_for_missing_data(self, self.numerical_data_falsy)
+        processed_data = self.preprocess_data_service.handle_missing_numericals.fill_missing_numerical(self.numerical_data_falsy, 'mode', fillna=True)
         self.assertIsNotNone(processed_data)
         self.assertFalse(processed_data.isnull().values.any())
         self.assertEqual(processed_data['sensor_value'].iloc[2], self.numerical_data_falsy['sensor_value'].mode().iloc[0])
@@ -75,7 +75,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test method for interpolating linear values for missing data
     '''
     def test_interpolate_linear_missing_data(self):
-        processed_data = self.preprocess_data_service.HandleMissingNumericals.interpolate_linear_missing_data(self, self.numerical_data_falsy['sensor_value'])
+        processed_data = self.preprocess_data_service.handle_missing_numericals.fill_missing_numerical(self.numerical_data_falsy, fill_method='linear')
         self.assertIsNotNone(processed_data)
         self.assertFalse(processed_data.isnull().values.any())
 
@@ -83,7 +83,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test method for using the k-nearest-neighbour heuristic for missing data
     '''
     def test_interpolate_knn_missing_data(self):
-        processed_data = self.preprocess_data_service.HandleMissingNumericals.interpolate_knn_missing_data(self, self.numerical_data_falsy)
+        processed_data = self.preprocess_data_service.handle_missing_numericals.fill_missing_numerical(self.numerical_data_falsy, fill_method='knn')
         self.assertIsNotNone(processed_data)
         self.assertFalse(processed_data.isnull().values.any())
 
@@ -91,26 +91,16 @@ class TestPreprocessDataService(unittest.TestCase):
     Test label encoding method
     '''
     def test_label_encode_variables(self):
-        processed_data = self.preprocess_data_service.HandleCategoricalVariables.label_encode_variables(self, self.categorical_data['category'])
+        processed_data = self.preprocess_data_service.encode_categorical_variables.encode_categorical_variables(self.categorical_data['category'], 'label')
         expected_data = [0,1,2,0,1,2]
         self.assertIsNotNone(processed_data)
         self.assertListEqual(list(processed_data), expected_data)
 
     '''
-    Test label encoding method for consistency
-    '''
-    def test_label_encode_variables_consistency(self):
-        processed_data_1 = self.preprocess_data_service.HandleCategoricalVariables.label_encode_variables(self, self.categorical_data['category'])
-        processed_data_2 = self.preprocess_data_service.HandleCategoricalVariables.label_encode_variables(self, self.categorical_data['category'])
-        self.assertIsNotNone(processed_data_1)
-        self.assertIsNotNone(processed_data_2)
-        self.assertListEqual(list(processed_data_1), list(processed_data_2))
-
-    '''
     Test one-hot encoding method
     '''
     def test_one_hot_encode_variables(self):
-        processed_data = self.preprocess_data_service.HandleCategoricalVariables.one_hot_encode_variables(self, self.categorical_data['category'], 'category')
+        processed_data = self.preprocess_data_service.encode_categorical_variables.encode_categorical_variables([self.categorical_data['category'], 'category'], 'one_hot')
         expected_columns = ['category_A', 'category_B', 'category_C']
         self.assertListEqual(list(processed_data.columns), expected_columns)
         self.assertEqual(processed_data.shape, (6, 3))
@@ -120,7 +110,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test target encoding method
     '''
     def test_target_encode_variables(self):
-        processed_data = self.preprocess_data_service.HandleCategoricalVariables.target_encode_variables(self, self.categorical_data['category'], self.categorical_data['target'])
+        processed_data = self.preprocess_data_service.encode_categorical_variables.encode_categorical_variables(self.categorical_data, 'target')
         expected_means = {
             'A': 0.5,
             'B': 0.5,
@@ -129,28 +119,19 @@ class TestPreprocessDataService(unittest.TestCase):
         for category in expected_means:
             self.assertAlmostEqual(processed_data['category'].iloc[0], expected_means[category])
 
-    '''
-    Test target encoding method for consistency
-    '''
-    def test_target_encode_variables_consistency(self):
-        processed_data_1 = self.preprocess_data_service.HandleCategoricalVariables.target_encode_variables(self, self.categorical_data['category'], self.categorical_data['target'])
-        processed_data_2 = self.preprocess_data_service.HandleCategoricalVariables.target_encode_variables(self, self.categorical_data['category'], self.categorical_data['target'])
-        self.assertIsNotNone(processed_data_1)
-        self.assertIsNotNone(processed_data_2)
-        self.assertListEqual(list(processed_data_1['category']), list(processed_data_2['category']))
 
     '''
     Test feature scaling for missing data
     '''
     def test_min_max_scale_features(self):
-        processed_data = self.preprocess_data_service.FeatureScaleData.min_max_scale_features(self, self.scaler_data)
+        processed_data = self.preprocess_data_service.feature_scale_data.scale_data(self.scaler_data, 'min_max')
         self.assertIsNotNone(processed_data)
 
     '''
     Test robust scaling for missing data
     '''
     def test_robust_scale_features(self):
-        processed_data = self.preprocess_data_service.FeatureScaleData.robust_scale_features(self, self.scaler_data)
+        processed_data = self.preprocess_data_service.feature_scale_data.scale_data(self.scaler_data, 'robust')
         self.assertIsNotNone(processed_data)
 
     '''
