@@ -1,16 +1,19 @@
 import unittest
-import numpy as np
 import pandas as pd
 from services import VisualizeDataService
 
-# Test class for VisualizeDataService
+'''
+Test class for VisualizeDataService
+'''
 class TestVisualizeDataService(unittest.TestCase):
     # Unittest special method to setup the test with a fresh state
     def setUp(self):
         self.visualize_data_service = VisualizeDataService()
 
 
-    # Test method assuring data visualization is handled correctly
+    '''
+    Test method assuring data visualization is handled correctly
+    '''
     def test_visualize_data(self):
         data = pd.DataFrame({
             'timestamp': pd.date_range(start='1/1/2020', periods=5), 
