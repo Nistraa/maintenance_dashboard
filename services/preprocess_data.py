@@ -69,8 +69,8 @@ class PreprocessDataService:
         def __target_encode(self, df: pd.DataFrame, category_column: str, target_column: str) -> pd.DataFrame:
             return TargetEncoder().fit_transform(df[category_column], df[target_column])
 
-        def __ordinal_encode(self, df: pd.DataFrame, category_column: str, target_column: str) -> pd.DataFrame:
-            return OrdinalEncoder().fit_transform(df[category_column], df[target_column])
+        def __ordinal_encode(self, df: pd.Series) -> pd.Series:
+            return OrdinalEncoder().fit_transform(df)
 
         '''
         Method for selecting the demanded encoder
@@ -83,7 +83,6 @@ class PreprocessDataService:
                 if not target_column:
                     raise ValueError("Target column must be provided for target encoding.")
                 return self.__encoding_method[encoding_method](df, category_column, target_column)
-            
             return self.__encoding_method[encoding_method](df[category_column])
 
 
