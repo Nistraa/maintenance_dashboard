@@ -1,4 +1,4 @@
-from services import LoadDataService, PreprocessDataService, ExtractFeaturesService, ModelService
+from services import LoadDataService, PreprocessDataService, ExtractFeaturesService, MachineLearningService
 from sklearn.metrics import classification_report, confusion_matrix
 
 '''
@@ -42,7 +42,7 @@ Make classification
 '''
 X = preprocess_data.column_operations.drop_columns(dataframe, ['Failure Type'])
 y = dataframe['Failure Type']
-model_service = ModelService(samples=X, features=y, test_size=0.2, random_state=21)
+model_service = MachineLearningService(samples=X, features=y, test_size=0.2, random_state=21)
 
 '''
 Train and test model for accuracy and score.
@@ -56,19 +56,19 @@ KNeighbors Classifier: 'knn'
 
 '''
 
-models_selected = ['log_reg', 'svc', 'knn']
+# models_selected = ['log_reg', 'svc', 'knn']
 
-for model in models_selected:
-    model_service.machine_learning_models.train_ml_model(model)
-    model_score = model_service.machine_learning_models.score_ml_model(model)
-    model_predictions = model_service.machine_learning_models.predict_ml_model(model)
-    model_accuracy = model_service.machine_learning_models.accuracy_score_ml_model(model)
+# for model in models_selected:
+#     model_service.machine_learning_models.train_ml_model(model)
+#     model_score = model_service.machine_learning_models.score_ml_model(model)
+#     model_predictions = model_service.machine_learning_models.predict_ml_model(model)
+#     model_accuracy = model_service.machine_learning_models.accuracy_score_ml_model(model)
 
-    print(f'{model} training accuracy: {model_score}')
-    print(f'{model} testing accuracy: {model_accuracy}')
-    print("\033[1m--------------------------------------------------------\033[0m")
-    print(f'{model} classification report:  \n {classification_report(model_service.y_test, model_predictions, zero_division=0.0)}')
-    print("\033[1m--------------------------------------------------------\033[0m")
-    print(f'{model} confusion matrix: \n {confusion_matrix(model_service.y_test, model_predictions)}')
-    print("\033[1m--------------------------------------------------------\033[0m")
-    print("\033[1m--------------------------------------------------------\033[0m")
+#     print(f'{model} training accuracy: {model_score}')
+#     print(f'{model} testing accuracy: {model_accuracy}')
+#     print("\033[1m--------------------------------------------------------\033[0m")
+#     print(f'{model} classification report:  \n {classification_report(model_service.y_test, model_predictions, zero_division=0.0)}')
+#     print("\033[1m--------------------------------------------------------\033[0m")
+#     print(f'{model} confusion matrix: \n {confusion_matrix(model_service.y_test, model_predictions)}')
+#     print("\033[1m--------------------------------------------------------\033[0m")
+#     print("\033[1m--------------------------------------------------------\033[0m")

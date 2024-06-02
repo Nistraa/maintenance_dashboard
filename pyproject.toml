@@ -18,6 +18,7 @@ pydantic = "^2.7.2"
 sqlmodel = "^0.0.18"
 category-encoders = "^2.6.3"
 xgboost = "^2.0.3"
+trio = "^0.25.1"
 
 [tool.poetry.dev-dependencies]
     pytest = "^6.2.3"

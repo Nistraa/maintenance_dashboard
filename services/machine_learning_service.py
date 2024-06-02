@@ -10,7 +10,7 @@ from sklearn.metrics import accuracy_score
 '''
 Service to instanciate, train and test machine learning models
 '''
-class ModelService:
+class MachineLearningService:
     def __init__(self, samples, features, test_size, random_state):
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
             samples,
