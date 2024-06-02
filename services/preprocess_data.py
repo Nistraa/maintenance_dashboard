@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.impute import KNNImputer
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler, RobustScaler
-from category_encoders import TargetEncoder
+from category_encoders import TargetEncoder, OrdinalEncoder
 
 
 '''
@@ -55,8 +55,10 @@ class PreprocessDataService:
             self.__encoding_method = {
                 'label': self.__label_encode,
                 'one_hot': self.__one_hot_encode,
-                'target': self.__target_encode
+                'target': self.__target_encode,
+                'ordinal': self.__ordinal_encode,
             }
+
 
         def __label_encode(self, data: pd.Series) -> pd.Series:
             return LabelEncoder().fit_transform(data)
@@ -66,6 +68,9 @@ class PreprocessDataService:
 
         def __target_encode(self, df: pd.DataFrame, category_column: str, target_column: str) -> pd.DataFrame:
             return TargetEncoder().fit_transform(df[category_column], df[target_column])
+
+        def __ordinal_encode(self, df: pd.DataFrame, category_column: str, target_column: str) -> pd.DataFrame:
+            return OrdinalEncoder().fit_transform(df[category_column], df[target_column])
 
         '''
         Method for selecting the demanded encoder

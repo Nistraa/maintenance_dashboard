@@ -121,6 +121,20 @@ class TestPreprocessDataService(unittest.TestCase):
 
 
     '''
+    Test ordinal encoding method
+    '''
+    def test_ordinal_encode_variables(self):
+        processed_data = self.preprocess_data_service.encode_categorical_variables.encode_categorical_variables(self.categorical_data, 'ordinal', 'category', 'target')
+        expected_means = {
+            'A': 0.5,
+            'B': 0.5,
+            'C': 0.5
+        }
+        for category in expected_means:
+            self.assertAlmostEqual(processed_data['category'].iloc[0], expected_means[category])
+
+
+    '''
     Test feature scaling for missing data
     '''
     def test_min_max_scale_features(self):
