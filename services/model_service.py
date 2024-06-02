@@ -1,6 +1,11 @@
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neighbors import KNeighborsClassifier
+from xgboost import XGBClassifier
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 '''
 Service to instanciate, train and test machine learning models
@@ -26,7 +31,13 @@ class ModelService:
             self.y_train = y_train
             self.y_test = y_test
             self.ml_models = {
-                'log_reg': LogisticRegression()
+                'log_reg': LogisticRegression(),
+                'decision_tree': DecisionTreeClassifier(),
+                #'random_forest': RandomForestClassifier(),
+                'svc': SVC(),
+                'naive_bayes': GaussianNB(),
+                'knn': KNeighborsClassifier(),
+                'xgb': XGBClassifier(),
             }
 
 
