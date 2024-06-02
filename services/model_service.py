@@ -37,7 +37,7 @@ class ModelService:
                 'svc': SVC(),
                 'naive_bayes': GaussianNB(),
                 'knn': KNeighborsClassifier(),
-                'xgb': XGBClassifier(),
+                #'xgb': XGBClassifier(),
             }
 
 
