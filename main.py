@@ -16,6 +16,13 @@ app = FastAPI()
 app.include_router(load_data_router.router, prefix="/load_data", tags=["Load Data"])
 
 
+
+
+@app.get("/")
+async def read_root():
+    return "Server is running"
+
+
 if __name__ == "__main__":
     uvicorn.run("app:app", host="localhost", port=8000)
 

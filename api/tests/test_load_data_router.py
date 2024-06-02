@@ -5,7 +5,7 @@ from api.load_data_router import router
 
 client = TestClient(router)
 
-def test_read_root():
+def test_journal_router():
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json() == "Server is running"
+    assert response.json() == "Router is running"
