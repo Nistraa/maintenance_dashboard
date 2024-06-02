@@ -1,5 +1,4 @@
 import unittest
-import numpy as np
 import pandas as pd
 import pandas.testing as pdt
 from services import ExtractFeaturesService

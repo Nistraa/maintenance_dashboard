@@ -2,7 +2,6 @@ import unittest
 from services import PreprocessDataService
 import pandas as pd
 import pandas.testing as pdt
-import numpy as np
 
 '''
 Test class for PreprocessDataService

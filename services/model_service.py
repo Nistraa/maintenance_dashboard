@@ -22,7 +22,7 @@ class ModelService:
 
 
     '''
-    Class containing methods to insitanciate, train and test machine learning models
+    Class containing methods to instanciate, train and test machine learning models
     '''
     class MachineLearningModels:
         def __init__(self, X_train, X_test, y_train, y_test) -> None:

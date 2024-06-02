@@ -2,10 +2,11 @@ import pandas as pd
 from sklearn.impute import KNNImputer
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler, RobustScaler
 from category_encoders import TargetEncoder
-import numpy as np
 
 
-# Service to preprocess data
+'''
+Service to preprocess data
+'''
 class PreprocessDataService:
     def __init__(self) -> None:
         self.column_operations = self.ColumnOperations()

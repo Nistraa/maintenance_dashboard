@@ -1,6 +1,4 @@
 import unittest
-import numpy as np
-import pandas as pd
 from services import ModelService
 from sklearn.datasets import make_classification
 
