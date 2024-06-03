@@ -22,39 +22,39 @@ class TestExtractFeaturesService(unittest.TestCase):
     correctly. 
     '''
     def test_pandas_standard_method_head(self):
-        dataframe = self.extract_features_service.pandas_standard_methods.pandas_standard_method(self.data, 'head')
+        dataframe = self.extract_features_service.pandas_standard_methods.select_method(self.data, 'head', 2)
         
         self.assertIsNotNone(dataframe)
         self.assertIsInstance(dataframe, pd.DataFrame)
-        pdt.assert_frame_equal(dataframe, self.data.head())
+        pdt.assert_frame_equal(dataframe, self.data.head(2))
 
     def test_pandas_standard_method_describe(self):
-        dataframe = self.extract_features_service.pandas_standard_methods.pandas_standard_method(self.data, 'describe')
+        dataframe = self.extract_features_service.pandas_standard_methods.select_method(self.data, 'describe', [.25, .50, .75])
 
         self.assertIsNotNone(dataframe)
         self.assertIsInstance(dataframe, pd.DataFrame)
-        pdt.assert_frame_equal(dataframe, self.data.describe())
+        pdt.assert_frame_equal(dataframe, self.data.describe([.25, .50, .75]))
 
 
     def test_pandas_standard_method_isna(self):
-        dataframe = self.extract_features_service.pandas_standard_methods.pandas_standard_method(self.data, 'isna')
+        dataframe = self.extract_features_service.pandas_standard_methods.select_method(self.data, 'isna')
         
         self.assertIsNotNone(dataframe)
         self.assertIsInstance(dataframe, pd.DataFrame)
         pdt.assert_frame_equal(dataframe, self.data.isna())
       
     def test_pandas_standard_method_uniques(self):
-        dataframe = self.extract_features_service.pandas_standard_methods.pandas_standard_method(self.data, 'uniques')
+        dataframe = self.extract_features_service.pandas_standard_methods.select_method(self.data, 'uniques', axis=1)
 
         self.assertIsNotNone(dataframe)
         self.assertIsInstance(dataframe, pd.Series)
-        pdt.assert_series_equal(dataframe, self.data.nunique())
+        pdt.assert_series_equal(dataframe, self.data.nunique(axis=1))
     '''
     Test method to assure if dataframe gets succesfully transformed into
     type dataframe after calling .info() method
     '''
     def test_pandas_standard_method_info(self):
-        dataframe = self.extract_features_service.pandas_standard_methods.pandas_standard_method(self.data, 'info')
+        dataframe = self.extract_features_service.pandas_standard_methods.select_method(self.data, 'info', max_cols=2)
         
         self.assertIsNotNone(dataframe)
         self.assertIsInstance(dataframe, pd.DataFrame)
