@@ -51,7 +51,6 @@ class ExtractFeaturesService:
         
 
         def select_method(self, df: pd.DataFrame, method_name: str, *args, **kwargs):
-            print(method_name)
             method = self.__pandas_methods.get(method_name)
             if method:
                 return method(df, *args, **kwargs)
