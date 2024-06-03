@@ -110,7 +110,6 @@ class PreprocessDataService:
             self.transform = self.__methods('transform')(self.transform)
             self.fit = self.__methods('fit')(self.fit)
 
-
         def fit_transform(self, encoder, *args, **kwargs):
             return encoder.fit_transform(*args,**kwargs)
 
