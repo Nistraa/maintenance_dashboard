@@ -30,7 +30,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test method for forward filling missing data
     '''
     def test_forward_fill_data(self):
-        processed_data = self.preprocess_data_service.handle_missing_numericals.fill_missing_numerical(self.numerical_data_falsy, 'ffill')
+        processed_data = self.preprocess_data_service.handle_missing_numericals.select_method('ffill', self.numerical_data_falsy)
         self.assertIsNotNone(processed_data)
         self.assertFalse(processed_data.isnull().values.any())
         self.assertEqual(processed_data['sensor_value'].iloc[2], 110.0)
@@ -39,7 +39,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test method for backward filling missing data
     '''
     def test_backward_fill_data(self):
-        processed_data = self.preprocess_data_service.handle_missing_numericals.fill_missing_numerical(self.numerical_data_falsy, fill_method='bfill')
+        processed_data = self.preprocess_data_service.handle_missing_numericals.select_method('bfill', self.numerical_data_falsy)
         self.assertIsNotNone(processed_data)
         self.assertFalse(processed_data.isnull().values.any())
         self.assertEqual(processed_data['sensor_value'].iloc[2], 115.0)
@@ -48,7 +48,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test method for using the mean for missing data
     '''
     def test_imputate_mean_for_missing_data(self):
-        processed_data = self.preprocess_data_service.handle_missing_numericals.fill_missing_numerical(self.numerical_data_falsy, 'mean', fillna=True)
+        processed_data = self.preprocess_data_service.handle_missing_numericals.select_method('mean', self.numerical_data_falsy)
         self.assertIsNotNone(processed_data)
         self.assertFalse(processed_data.isnull().values.any())
         self.assertEqual(processed_data['sensor_value'].iloc[2], self.numerical_data_falsy['sensor_value'].mean())
@@ -57,7 +57,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test method for using the median for missing data
     '''
     def test_imputate_median_for_missing_data(self):
-        processed_data = self.preprocess_data_service.handle_missing_numericals.fill_missing_numerical(self.numerical_data_falsy, 'median', fillna=True)
+        processed_data = self.preprocess_data_service.handle_missing_numericals.select_method('median', self.numerical_data_falsy)
         self.assertIsNotNone(processed_data)
         self.assertFalse(processed_data.isnull().values.any())
         self.assertEqual(processed_data['sensor_value'].iloc[2], self.numerical_data_falsy['sensor_value'].median())
@@ -66,7 +66,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test method for using the mode for missing data
     '''
     def test_imputate_mode_for_missing_data(self):
-        processed_data = self.preprocess_data_service.handle_missing_numericals.fill_missing_numerical(self.numerical_data_falsy, 'mode', fillna=True)
+        processed_data = self.preprocess_data_service.handle_missing_numericals.select_method( 'mode', self.numerical_data_falsy)
         self.assertIsNotNone(processed_data)
         self.assertFalse(processed_data.isnull().values.any())
         self.assertEqual(processed_data['sensor_value'].iloc[2], self.numerical_data_falsy['sensor_value'].mode().iloc[0])
@@ -75,7 +75,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test method for interpolating linear values for missing data
     '''
     def test_interpolate_linear_missing_data(self):
-        processed_data = self.preprocess_data_service.handle_missing_numericals.fill_missing_numerical(self.numerical_data_falsy, fill_method='linear')
+        processed_data = self.preprocess_data_service.handle_missing_numericals.select_method('linear', self.numerical_data_falsy, 'linear')
         self.assertIsNotNone(processed_data)
         self.assertFalse(processed_data.isnull().values.any())
 
@@ -83,7 +83,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test method for using the k-nearest-neighbour heuristic for missing data
     '''
     def test_interpolate_knn_missing_data(self):
-        processed_data = self.preprocess_data_service.handle_missing_numericals.fill_missing_numerical(self.numerical_data_falsy, fill_method='knn')
+        processed_data = self.preprocess_data_service.handle_missing_numericals.select_method('knn', self.numerical_data_falsy)
         self.assertIsNotNone(processed_data)
         self.assertFalse(processed_data.isnull().values.any())
 
@@ -91,7 +91,8 @@ class TestPreprocessDataService(unittest.TestCase):
     Test label encoding method
     '''
     def test_label_encode_variables(self):
-        processed_data = self.preprocess_data_service.encode_categorical_variables.encode_categorical_variables(self.categorical_data, 'label', 'category')
+        processed_data = self.preprocess_data_service.encode_categorical_variables.select_encoder_and_method('label', 'fit_transform', self.categorical_data['category'])
+        
         expected_data = [0,1,2,0,1,2]
         self.assertIsNotNone(processed_data)
         self.assertListEqual(list(processed_data), expected_data)
@@ -100,7 +101,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test one-hot encoding method
     '''
     def test_one_hot_encode_variables(self):
-        processed_data = self.preprocess_data_service.encode_categorical_variables.encode_categorical_variables(self.categorical_data, 'one_hot', 'category', 'target')
+        processed_data = self.preprocess_data_service.encode_categorical_variables.select_encoder_and_method('one_hot', 'one_hot', self.categorical_data['category'])
         expected_columns = ['category_A', 'category_B', 'category_C']
         self.assertListEqual(list(processed_data.columns), expected_columns)
         self.assertEqual(processed_data.shape, (6, 3))
@@ -110,7 +111,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test target encoding method
     '''
     def test_target_encode_variables(self):
-        processed_data = self.preprocess_data_service.encode_categorical_variables.encode_categorical_variables(self.categorical_data, 'target', 'category', 'target')
+        processed_data = self.preprocess_data_service.encode_categorical_variables.select_encoder_and_method('target', 'fit_transform', self.categorical_data['category'], self.categorical_data['target'])
         expected_means = {
             'A': 0.5,
             'B': 0.5,
@@ -124,7 +125,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test ordinal encoding method
     '''
     def test_ordinal_encode_variables(self):
-        processed_data = self.preprocess_data_service.encode_categorical_variables.encode_categorical_variables(self.categorical_data, 'ordinal', 'category')
+        processed_data = self.preprocess_data_service.encode_categorical_variables.select_encoder_and_method('ordinal', 'fit_transform', self.categorical_data['category'])
 
         self.assertEqual(list(processed_data['category']), [1, 2, 3, 1, 2, 3])
 
@@ -146,14 +147,14 @@ class TestPreprocessDataService(unittest.TestCase):
     Test for functionality of dropping a column
     '''
     def test_drop_columns(self):
-        manipulated_data = self.preprocess_data_service.column_operations.drop_columns(self.numerical_data, ['sensor_to_drop_1', 'sensor_to_drop_2'])
+        manipulated_data = self.preprocess_data_service.column_operations.select_method('drop', self.numerical_data, ['sensor_to_drop_1', 'sensor_to_drop_2'], axis='columns')
 
         pdt.assert_frame_equal(manipulated_data, self.numerical_data.drop(['sensor_to_drop_1', 'sensor_to_drop_2'], axis='columns'))
     '''
     Test addition of two columns
     '''
     def test_arithmetic_operations_addition(self):
-        manipulated_data = self.preprocess_data_service.column_operations.mutate_column(self.numerical_data, 'addition', 'sensor_target', 'sensor_operand')
+        manipulated_data = self.preprocess_data_service.column_operations.select_method('mutate', self.numerical_data, operation_name='addition', target_column='sensor_target', operand_column='sensor_operand')
         self.numerical_data['sensor_target'] = self.numerical_data['sensor_target'] + self.numerical_data['sensor_operand']
         
         self.assertIsNotNone(manipulated_data)
@@ -164,7 +165,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test subtraction of two columns
     '''
     def test_arithmetic_operations_subtraction(self):
-        manipulated_data = self.preprocess_data_service.column_operations.mutate_column(self.numerical_data, 'subtraction', 'sensor_target', 'sensor_operand')
+        manipulated_data = self.preprocess_data_service.column_operations.select_method('mutate', self.numerical_data, operation_name='subtraction', target_column='sensor_target', operand_column='sensor_operand')
         self.numerical_data['sensor_target'] = self.numerical_data['sensor_target'] - self.numerical_data['sensor_operand']
 
         self.assertIsNotNone(manipulated_data)
@@ -174,7 +175,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test multiplication of two columns
     '''
     def test_arithmetic_operations_multiplication(self):
-        manipulated_data = self.preprocess_data_service.column_operations.mutate_column(self.numerical_data, 'multiplication', 'sensor_target', 'sensor_operand')
+        manipulated_data = self.preprocess_data_service.column_operations.select_method('mutate', self.numerical_data, operation_name='multiplication', target_column='sensor_target', operand_column='sensor_operand')
         self.numerical_data['sensor_target'] = self.numerical_data['sensor_target'] * self.numerical_data['sensor_operand']
 
         self.assertIsNotNone(manipulated_data)
@@ -184,7 +185,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test division of two columns
     '''
     def test_arithmetic_operations_division(self):
-        manipulated_data = self.preprocess_data_service.column_operations.mutate_column(self.numerical_data, 'division', 'sensor_target', 'sensor_operand')
+        manipulated_data = self.preprocess_data_service.column_operations.select_method('mutate', self.numerical_data, operation_name='division', target_column='sensor_target', operand_column='sensor_operand')
         self.numerical_data['sensor_target'] = self.numerical_data['sensor_target'] / self.numerical_data['sensor_operand']
 
         self.assertIsNotNone(manipulated_data)
@@ -194,7 +195,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test squaring of two columns
     '''
     def test_arithmetic_operations_square(self):
-        manipulated_data = self.preprocess_data_service.column_operations.mutate_column(self.numerical_data, 'square', 'sensor_target')
+        manipulated_data = self.preprocess_data_service.column_operations.select_method('mutate', self.numerical_data, operation_name='square', target_column='sensor_target')
         self.numerical_data['sensor_target'] = self.numerical_data['sensor_target'] ** self.numerical_data['sensor_target']
 
         self.assertIsNotNone(manipulated_data)
@@ -204,14 +205,14 @@ class TestPreprocessDataService(unittest.TestCase):
     Tests for creating a new column
     '''
     def test_column_creation_square(self):
-        manipulated_data = self.preprocess_data_service.column_operations.create_column(self.numerical_data, 'square', 'new_column', 'sensor_operand')
+        manipulated_data = self.preprocess_data_service.column_operations.select_method('create', self.numerical_data, operation_name='square', new_column='new_column', operand_column_1='sensor_operand')
 
         self.assertIsNotNone(manipulated_data)
         self.assertIsInstance(manipulated_data, pd.DataFrame)
         self.assertTrue(len(manipulated_data.columns) > len(self.numerical_data.columns))
 
     def test_column_creation_subtraction(self):
-        manipulated_data = self.preprocess_data_service.column_operations.create_column(self.numerical_data, 'subtraction', 'new_column', 'sensor_target', 'sensor_operand')
+        manipulated_data = self.preprocess_data_service.column_operations.select_method('create', self.numerical_data, operation_name='subtraction', new_column='new_column', operand_column_2='sensor_target', operand_column_1='sensor_operand')
 
         self.assertIsNotNone(manipulated_data)
         self.assertIsInstance(manipulated_data, pd.DataFrame)
@@ -221,7 +222,7 @@ class TestPreprocessDataService(unittest.TestCase):
     Test for renaming of a column
     '''
     def test_column_renaming(self):
-        manipulated_data = self.preprocess_data_service.column_operations.rename_column(self.numerical_data_falsy, 'sensor_value', 'changed')
+        manipulated_data = self.preprocess_data_service.column_operations.select_method('rename', self.numerical_data_falsy, columns={'sensor_value': 'changed'})
 
         self.assertIsNotNone(manipulated_data)
         self.assertIsInstance(manipulated_data, pd.DataFrame)
